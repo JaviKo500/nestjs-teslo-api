@@ -19,7 +19,7 @@ export class ProductsController {
   }
 
   @Get(':query')
-  findOne(@Param('query', ParseUUIDPipe) query: string) {
+  findOne(@Param('query') query: string) {
     return this.productsService.findOne(query);
   }
 

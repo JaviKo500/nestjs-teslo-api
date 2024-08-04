@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
-
+import { validate as isUUID } from 'uuid';
 @Injectable()
 export class ProductsService {
 
@@ -42,15 +42,23 @@ export class ProductsService {
 
   async findOne(query: string) {
     try {
-      let product: Product = await this.productRepository.findOneBy(
-        {
-          slug: query
-        }
-      )
-      if ( !product ) {
+      let product: Product;
+      if ( isUUID( query ) ) { 
         product = await this.productRepository.findOneBy(
           {
             id: query
+          }
+        );
+      } else if ( !product ) {
+        product = await this.productRepository.findOneBy(
+          {
+            slug: query
+          }
+        );
+      } else {
+        product =  await this.productRepository.findOneBy(
+          {
+            title: query
           }
         );
       }
@@ -82,14 +90,13 @@ export class ProductsService {
   }
 
   private handelDBExceptions(error: any) {
-    this.logger.error( `${error.message} - ${error.detail}` );
     if ( error.code === '23505') {
       throw new BadRequestException(error.detail);
     }
     if ( error.status === 404 ) {
       throw new NotFoundException( error.message );
-
     }
+    this.logger.error( `${error.message} - ${error.detail}` );
     throw new InternalServerErrorException('Unexpected error check server lgos');
   }
 }
