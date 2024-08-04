@@ -70,9 +70,15 @@ export class ProductsService {
     }
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto) {
+  async update(id: string, updateProductDto: UpdateProductDto) {
     try {
-      
+      const product = await this.productRepository.preload({
+        id,
+        ...updateProductDto
+      });
+
+      if ( !product ) throw new NotFoundException( `Product whit id "${id}" not found` );
+      return await this.productRepository.save( product );
     } catch (error) {
       this.handelDBExceptions(error);
     }
