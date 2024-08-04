@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
+import { title } from 'process';
 @Injectable()
 export class ProductsService {
 
@@ -49,18 +50,17 @@ export class ProductsService {
             id: query
           }
         );
-      } else if ( !product ) {
-        product = await this.productRepository.findOneBy(
-          {
-            slug: query
-          }
-        );
       } else {
-        product =  await this.productRepository.findOneBy(
-          {
-            title: query
-          }
-        );
+        const queryBuilder = this.productRepository.createQueryBuilder();
+        product = await queryBuilder
+          .where(
+            `LOWER(title) =:title or slug =:slug`, 
+            { 
+              title: query.toLowerCase(), 
+              slug: query.toLowerCase(),
+            }
+          )
+          .getOne();
       }
 
       if ( !product ) throw new NotFoundException( `Product whit query "${query}" not found` );
