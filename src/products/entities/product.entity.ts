@@ -41,7 +41,8 @@ export class Product {
       () => ProductImageEntity,
       productImage => productImage.product,
       {
-         cascade: true
+         cascade: true,
+         eager: true,
       }
    )
    images?: ProductImageEntity []

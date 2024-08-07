@@ -33,12 +33,19 @@ export class ProductsService {
     }
   }
 
-  findAll( { limit = 10, offset = 0 }: PaginationDto ) {
+  async findAll( { limit = 10, offset = 0 }: PaginationDto ) {
     try {
-      return this.productRepository.find({
+      const products = await this.productRepository.find({
         take: limit,
         skip: offset,
+        relations: {
+          images: true
+        }
       });
+      return products.map( ({ images, ...rest }) => ({ 
+        ...rest, 
+        images: images.map( img => img.url ),
+      }));
     } catch (error) {
       this.handelDBExceptions( error );
     }
@@ -54,7 +61,7 @@ export class ProductsService {
           }
         );
       } else {
-        const queryBuilder = this.productRepository.createQueryBuilder();
+        const queryBuilder = this.productRepository.createQueryBuilder('prod');
         product = await queryBuilder
           .where(
             `LOWER(title) =:title or slug =:slug`, 
@@ -63,13 +70,24 @@ export class ProductsService {
               slug: query.toLowerCase(),
             }
           )
+          .leftJoinAndSelect('prod.images', 'prodImages')
           .getOne();
       }
 
       if ( !product ) throw new NotFoundException( `Product whit query "${query}" not found` );
+
+      // product.images = product.images.map( image => image.url );
       return product;
     } catch (error) {
       this.handelDBExceptions(error);
+    }
+  }
+
+  async findOnePlain( query: string ) {
+    const product = await this.findOne( query );
+    return {
+      ...product,
+      images: product.images.map( image => image.url ),
     }
   }
 
