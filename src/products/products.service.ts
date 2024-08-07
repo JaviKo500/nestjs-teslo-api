@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, InternalServerErrorException, Logger, 
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
 import { ProductImageEntity, Product } from './entities';
@@ -14,7 +14,9 @@ export class ProductsService {
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
     @InjectRepository(ProductImageEntity)
-    private readonly productImageRepository: Repository<ProductImageEntity>
+    private readonly productImageRepository: Repository<ProductImageEntity>,
+
+    private readonly dataSource:  DataSource,
   ) {
     
   }
@@ -93,12 +95,15 @@ export class ProductsService {
 
   async update(id: string, updateProductDto: UpdateProductDto) {
     try {
+      const { images, ...toUpdate } = updateProductDto;
       const product = await this.productRepository.preload({
         id,
-        ...updateProductDto,
-        images: []
+        ...toUpdate,
       });
 
+      const queryRunner = this.dataSource.createQueryRunner(
+        
+      );
       if ( !product ) throw new NotFoundException( `Product whit id "${id}" not found` );
       return await this.productRepository.save( product );
     } catch (error) {
