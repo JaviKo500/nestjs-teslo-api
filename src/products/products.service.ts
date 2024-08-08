@@ -116,7 +116,7 @@ export class ProductsService {
         );
         product.images = images.map( image => this.productImageRepository.create( { url: image } ));
       }
-      
+
       if ( !product ) throw new NotFoundException( `Product whit id "${id}" not found` );
       await queryRunner.manager.save( product );
       await queryRunner.commitTransaction();
@@ -148,6 +148,18 @@ export class ProductsService {
       throw new NotFoundException( error.message );
     }
     this.logger.error( `${error.message} - ${error.detail}` );
-    throw new InternalServerErrorException('Unexpected error check server lgos');
+    throw new InternalServerErrorException('Unexpected error check server logs');
+  }
+
+  async deleteAllProducts() {
+    const query = this.productRepository.createQueryBuilder('product');
+    try {
+      return await query
+        .delete()
+        .where({})
+        .execute();
+    } catch (error) {
+      this.handelDBExceptions( error );
+    }
   }
 }
