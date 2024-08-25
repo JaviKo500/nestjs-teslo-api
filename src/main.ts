@@ -11,7 +11,7 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
-    })
+    }),
   );
   await app.listen(process.env.PORT);
   logger.log(`App running in port" ${process.env.PORT}`)
