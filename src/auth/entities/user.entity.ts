@@ -24,7 +24,7 @@ export class User {
 
    @Column({
       type: 'bool',
-      unique: true,
+      default: true,
    })
    public isActive: boolean;
 
