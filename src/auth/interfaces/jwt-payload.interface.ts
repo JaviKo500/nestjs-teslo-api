@@ -1,4 +1,5 @@
 export interface JwtPayloadInterface {
-   email: string;
+   // email: string;
+   id: string;
    // TODO : add all save in token
 }
