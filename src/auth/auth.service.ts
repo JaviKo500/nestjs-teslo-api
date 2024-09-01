@@ -1,11 +1,13 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { User } from './entities/user.entity';
 import { CreateUserDto, LoginUserDto } from './dto';
+import { JwtPayloadInterface } from './interfaces/jwt-payload.interface';
 @Injectable()
 export class AuthService {
 
@@ -14,6 +16,7 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService
   ) {
 
   }
@@ -26,7 +29,10 @@ export class AuthService {
       });
       await this.userRepository.save(user);
       delete user.password;
-      return user;
+      return {
+        ...user,
+        token: this.getJwtToken( { email: user.email } )
+      };
     } catch (error) {
       this.handelDBExceptions(error)
     }
@@ -44,7 +50,15 @@ export class AuthService {
     if ( !user || !bcrypt.compareSync( password, user.password) ) 
       throw new UnauthorizedException( 'Invalid credentials');
     
-    return user;
+    return {
+      ...user,
+      token: this.getJwtToken( { email: user.email } ),
+    };
+  }
+
+  private getJwtToken( payload: JwtPayloadInterface ) {
+    const token = this.jwtService.sign( payload );
+    return token;
   }
 
   private handelDBExceptions(error: any): never {
