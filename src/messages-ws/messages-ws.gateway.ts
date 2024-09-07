@@ -29,6 +29,22 @@ export class MessagesWsGateway implements OnGatewayConnection, OnGatewayDisconne
     console.log('<--------------- JK Messages-ws.gateway --------------->');
     console.log(client.id );
     console.log(payload);
+    // only emit client
+    // client.emit( 'message-from-client', { 
+    //   fullName: 'Test',
+    //   message: payload.message ?? 'No message received'
+    // });
+    // emit all minus client
+    // client.broadcast.emit( 'message-from-client', { 
+    //   fullName: 'Test',
+    //   message: payload.message ?? 'No message received'
+    // });
+
+    // all
+    this.wss.emit( 'message-from-client', { 
+      fullName: 'Test',
+      message: payload.message ?? 'No message received'
+    });
   }
 
 }
