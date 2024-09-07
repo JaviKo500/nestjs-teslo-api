@@ -9,46 +9,76 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, OneToMany, Prima
 })
 export class Product {
 
-   @ApiProperty()
+   @ApiProperty({
+      example: 'fb2dc4c6-3087-4f44-baed-dfb2c0cfbb9a',
+      description: 'Product UUID',
+      uniqueItems: true,
+   })
    @PrimaryGeneratedColumn('uuid')
    id: string;
 
-   @ApiProperty()
+   @ApiProperty({
+      example: 'T-shirt teslo',
+      description: 'Product title',
+      uniqueItems: true,
+   })
    @Column('text', {
       unique: true,
    })
    title: string;
 
-   @ApiProperty()
+   @ApiProperty({
+      example: '2.5',
+      description: 'Product price',
+   })
    @Column('float', {
       default: 0
    })
    price: number;
 
-   @ApiProperty()
+   @ApiProperty({
+      example: 'T shirt summer',
+      description: 'Product description',
+   })
    @Column({
       type: 'text',
       nullable: true,
    })
    description: string;
 
-   @ApiProperty()
+   @ApiProperty({
+      example: 't-shirt',
+      description: 'Product slug',
+      uniqueItems: true,
+   })
    @Column({ type: 'text', unique: true, })
    slug: string;
 
-   @ApiProperty()
+   @ApiProperty({
+      example: '10',
+      description: 'Product stock',
+   })
    @Column({ type: 'int', default: 0, })
    stock: number;
 
-   @ApiProperty()
+   @ApiProperty({
+      example: [ 'X', 'XL', 'L', 'S' ],
+      description: 'Product sizes',
+   })
    @Column({ type: 'text', array: true, })
    sizes: string[];
 
-   @ApiProperty()
+   @ApiProperty({
+      example: 'woman',
+      description: 'Product gender',
+   })
    @Column( 'text' )
    gender: string;
 
-   @ApiProperty()
+   @ApiProperty({
+      example: ['t-shirt', 'woman'],
+      description: 'Product tags',
+   })
    @Column({ type: 'text', array: true, default: [], nullable: true })
    tags: string[];
 
