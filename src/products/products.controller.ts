@@ -7,7 +7,7 @@ import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { ValidRoles } from 'src/auth/interfaces';
 import { User } from 'src/auth/entities/user.entity';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Product } from './entities';
 
 @ApiTags( 'Products')
@@ -31,6 +31,7 @@ export class ProductsController {
     status: 403,
     description: 'Forbidden, Token related'
   })
+  @ApiBearerAuth()
   create(
     @Body() createProductDto: CreateProductDto,
     @GetUser() user: User,
@@ -50,6 +51,7 @@ export class ProductsController {
 
   @Patch(':id')
   @Auth( ValidRoles.admin )
+  @ApiBearerAuth()
   update(
     @Param('id', ParseUUIDPipe) id: string, 
     @Body() updateProductDto: UpdateProductDto,
@@ -60,6 +62,7 @@ export class ProductsController {
 
   @Delete(':id')
   @Auth( ValidRoles.admin )
+  @ApiBearerAuth()
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.remove(id);
   }

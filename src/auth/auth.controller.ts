@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto } from './dto';
@@ -29,6 +29,7 @@ export class AuthController {
 
   @Get('private')
   @UseGuards( AuthGuard() )
+  @ApiBearerAuth()
   testingPrivateRoutes(
     // @Req() request: Express.Request,
     @GetUser() user: User,
@@ -48,6 +49,7 @@ export class AuthController {
   @Get('private2')
   @RoleProtected( ValidRoles.superUser, ValidRoles.user )
   @UseGuards( AuthGuard(), UserRolGuard )
+  @ApiBearerAuth()
   testingPrivate2Routes(
     @GetUser() user: User,
   ) {
@@ -59,6 +61,7 @@ export class AuthController {
 
   @Get('private3')
   @Auth( ValidRoles.superUser, ValidRoles.user )
+  @ApiBearerAuth()
   testingPrivate3Routes(
     @GetUser() user: User,
   ) {
@@ -70,6 +73,7 @@ export class AuthController {
 
   @Get('check-status')
   @Auth()
+  @ApiBearerAuth()
   checkAuthStatus(
     @GetUser() user: User,
   ) {
