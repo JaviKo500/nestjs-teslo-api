@@ -3,12 +3,13 @@ import { Response } from 'express';
 
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Controller, Post, UploadedFile, UseInterceptors, BadRequestException, Get, Res, Param} from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { FilesService } from './files.service';
 import { fileFilterHelper, fileNamerHelper } from './helpers';
 import { ConfigService } from '@nestjs/config';
 
-
+@ApiTags( 'Files')
 @Controller('files')
 export class FilesController {
   constructor(
