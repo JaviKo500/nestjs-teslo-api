@@ -29,7 +29,7 @@ export class MessagesWsService {
         const user = await  this.userRepository.findOneBy({ id });
         if ( !user ) throw new Error(`User not find`);
         if ( !user.isActive ) throw new Error(`User not active`);
-
+        this.checkUserConnection( user );
         this.connectClients[client.id] = {
             socket: client,
             user,
@@ -56,5 +56,18 @@ export class MessagesWsService {
      */
     public getUserFullName( socketId: string ) {
         return this.connectClients[socketId].user.fullName;
+    }
+
+    /**
+     * checkUserConnection
+     */
+    private checkUserConnection( user: User ) {
+        for (const clientId of Object.keys( this.connectClients )) {
+            const connectedClient = this.connectClients[clientId];
+            if (connectedClient.user.id === user.id){
+                connectedClient.socket.disconnect();
+                break;
+            } 
+        }
     }
 }
