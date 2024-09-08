@@ -17,14 +17,13 @@ export class MessagesWsGateway implements OnGatewayConnection, OnGatewayDisconne
   ) {}
   
   
-  handleConnection( client: Socket ) {
+  async handleConnection( client: Socket ) {
 
     try {
       const token = client.handshake.headers.authentication as string ?? '';
       let payload: JwtPayloadInterface = this.jwtService.verify( token );
-      console.log('<--------------- JK Messages-ws.gateway --------------->');
-      console.log(payload); 
-      this.messagesWsService.registerClient( client );
+
+      await this.messagesWsService.registerClient( client, payload.id );
       this.wss.emit( 'clients-updated', this.messagesWsService.getConnectedClients() );
     } catch (error) {
       client.disconnect();
@@ -41,9 +40,6 @@ export class MessagesWsGateway implements OnGatewayConnection, OnGatewayDisconne
 
   @SubscribeMessage( 'message-from-client' )
   handleMessageFromClient( client: Socket, payload: NewMessageDto ) {
-    console.log('<--------------- JK Messages-ws.gateway --------------->');
-    console.log(client.id );
-    console.log(payload);
     // only emit client
     // client.emit( 'message-from-client', { 
     //   fullName: 'Test',
@@ -57,7 +53,7 @@ export class MessagesWsGateway implements OnGatewayConnection, OnGatewayDisconne
 
     // all
     this.wss.emit( 'message-from-client', { 
-      fullName: 'Test',
+      fullName: this.messagesWsService.getUserFullName( client.id ),
       message: payload.message ?? 'No message received'
     });
   }
