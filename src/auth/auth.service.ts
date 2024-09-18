@@ -45,7 +45,9 @@ export class AuthService {
       select: {
         email: true,
         password: true,
-        id: true
+        id: true,
+        fullName: true,
+        roles: true,
       }
     });
     if ( !user || !bcrypt.compareSync( password, user.password) ) 
