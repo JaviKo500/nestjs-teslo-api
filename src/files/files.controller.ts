@@ -30,9 +30,10 @@ export class FilesController {
   }) )
   uploadProductImage( @UploadedFile( ) file: Express.Multer.File ) {
     if ( !file ) throw new BadRequestException( 'Make sure that file in image' );
-    const secureUrl = `${this.configService.get('HOST_API')}/files/products/${file.filename}`;
+    // const image = `${this.configService.get('HOST_API')}/files/products/${file.filename}`;
+    const image = file.filename;
     return {
-      secureUrl
+      image
     };
   }
 
